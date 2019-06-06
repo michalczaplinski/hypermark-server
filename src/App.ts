@@ -5,21 +5,25 @@ import logger from "morgan";
 import cors from "cors";
 
 import routes from "./routes";
-
-const defaultPort = process.env.PORT || "3333";
-const defaultMongoURI = process.env.MONGODB_URI;
+import { Server } from "http";
 
 class Application {
   port?: string;
-  mongoURI?: string;
+  mongoURI: string;
   connection?: mongoose.Connection;
+  app!: Express.Application;
+  server!: Server;
 
-  constructor(port: string, mongoURI: string) {
+  constructor(port?: string, mongoURI?: string) {
+    const defaultPort = process.env.PORT || "3003";
+    const defaultMongoURI = process.env.MONGO_URI;
+
     this.port = port || defaultPort;
+
     if (!mongoURI && !defaultMongoURI) {
       throw new Error("The mongo URI is not provided!");
     }
-    this.mongoURI = mongoURI || defaultMongoURI;
+    this.mongoURI = mongoURI || (defaultMongoURI as string);
   }
 
   async start() {
@@ -47,13 +51,11 @@ class Application {
 
       app.use("/", routes);
 
-      app.use(errorHandler);
+      // app.use(errorHandler);
 
       this.server = app.listen(this.port);
 
       app.listen(3333, async () => {
-        console.log("Server ready!");
-        console.log("Database ready!");
         console.log(`Listening on port ${this.port}`);
       });
       this.app = app;
@@ -69,4 +71,4 @@ class Application {
   }
 }
 
-module.exports = Application;
+export default Application;

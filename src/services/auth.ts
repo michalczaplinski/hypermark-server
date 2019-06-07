@@ -3,19 +3,19 @@ import jwt from "jsonwebtoken";
 import { randomBytes } from "crypto";
 
 import UserModel from "../models/user";
-import { IUser } from "../types";
+import { IUser, AppError } from "../types";
 
 export default class AuthService {
   public async login(email: string, password: string): Promise<any> {
     const user = await UserModel.findOne({ email });
     if (!user) {
-      throw new Error("User not found");
+      throw new AppError(400, "User not found");
     } else if (!user.password) {
-      throw new Error("The user does not have a password!");
+      throw new AppError(400, "The user does not have a password");
     } else {
       const correctPassword = await argon2.verify(user.password, password);
       if (!correctPassword) {
-        throw new Error("Incorrect password");
+        throw new AppError(400, "Incorrect password");
       }
     }
 
@@ -53,15 +53,15 @@ export default class AuthService {
   }
 
   private generateJWT(user: IUser) {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new AppError(401, "There is no JWT secret set");
     return jwt.sign(
       {
-        data: {
-          _id: user._id,
-          name: user.name,
-          email: user.email
-        }
+        _id: user._id,
+        name: user.name,
+        email: user.email
       },
-      "nvas0874ythbgn9oasud" // TODO: move this to an env var
+      secret
     );
   }
 }

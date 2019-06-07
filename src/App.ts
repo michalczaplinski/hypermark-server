@@ -6,6 +6,7 @@ import cors from "cors";
 
 import routes from "./routes";
 import { Server } from "http";
+import errorHandler from "./middlewares/errorHandler";
 
 class Application {
   port?: string;
@@ -48,10 +49,8 @@ class Application {
           ? (req, res, next) => next()
           : logger("dev")
       );
-
       app.use("/", routes);
-
-      // app.use(errorHandler);
+      app.use(errorHandler);
 
       this.server = app.listen(this.port);
 

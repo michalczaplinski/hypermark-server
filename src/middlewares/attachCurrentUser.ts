@@ -1,15 +1,23 @@
 import UserModel from "../models/user";
+import { NextFunction, Response } from "express";
+import { IRequest } from "../types";
 
-export default async (req, res, next) => {
+const attachCurrentUser = async (
+  req: IRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const decodedUser = req.token.data;
+    const decodedUser = req.token;
     const user = await UserModel.findOne({ _id: decodedUser._id });
     if (!user) {
-      res.status(401).end();
+      return res.status(401).end();
     }
     req.currentUser = user;
     return next();
-  } catch (e) {
-    return res.json(e).status(500);
+  } catch (err) {
+    return next(err);
   }
 };
+
+export default attachCurrentUser;

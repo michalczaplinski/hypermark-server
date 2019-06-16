@@ -1,17 +1,17 @@
 import { MongoError } from "mongodb";
 import { Error as MongooseError } from "mongoose";
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../types";
+
+import { AppError } from '../errors';
 
 type IError = MongoError | MongooseError.ValidationError | AppError;
 
 export default async (
   err: IError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
-  console.error(err);
 
   // We want to grab the first validator error
   // https://mongoosejs.com/docs/api.html#document_Document-invalidate
@@ -29,6 +29,10 @@ export default async (
       error: "DuplicateKey",
       message: `${property} must be unique`
     });
+  }
+
+  if (err.name === 'UnauthorizedError') {
+    return err;
   }
 
   if (err instanceof AppError) {

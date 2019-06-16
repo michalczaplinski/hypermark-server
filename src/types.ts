@@ -1,5 +1,6 @@
-import { Request } from "express";
+import { Request, Response, NextFunction, RequestHandler as Handler } from "express";
 import { Document } from "mongoose";
+import { RequestHandler } from "express-jwt";
 
 export interface IUserCore {
   _id: string;
@@ -12,28 +13,11 @@ export interface IUser extends IUserCore {
   salt?: string;
 }
 
-export type IRequest = {
-  token: IUserCore;
-  currentUser: IUser & Document;
+export type Request = {
+  token?: IUserCore;
+  currentUser?: IUser & Document;
 } & Request;
 
-export class AppError {
-  httpCode: number;
-  name: string;
-  description?: string;
-  isOperational?: boolean;
-
-  constructor(
-    httpCode: number,
-    name: string,
-    description?: string,
-    isOperational?: boolean
-  ) {
-    Error.call(this);
-    Error.captureStackTrace(this);
-    this.name = name;
-    this.httpCode = httpCode;
-    this.description = description;
-    this.isOperational = isOperational;
-  }
+export interface IMiddleware {
+  (req: Request, res: Response, next: NextFunction): any
 }

@@ -3,7 +3,8 @@ import jwt from "jsonwebtoken";
 import { randomBytes } from "crypto";
 
 import UserModel from "../models/user";
-import { IUser, AppError } from "../types";
+import { IUser } from "../types";
+import { AppError } from "../errors";
 
 export default class AuthService {
   public async login(email: string, password: string): Promise<any> {

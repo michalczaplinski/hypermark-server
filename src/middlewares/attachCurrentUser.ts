@@ -1,22 +1,23 @@
 import UserModel from "../models/user";
-import { NextFunction, Response } from "express";
-import { IRequest } from "../types";
+import { NextFunction, Response, RequestHandler } from "express";
+import { Request } from "../types";
 
 const attachCurrentUser = async (
-  req: IRequest,
+  req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<any> => {
   try {
     const decodedUser = req.token;
+    if (!decodedUser) return res.status(401).end();
+
     const user = await UserModel.findOne({ _id: decodedUser._id });
-    if (!user) {
-      return res.status(401).end();
-    }
+    if (!user) return res.status(401).end();
+
     req.currentUser = user;
-    return next();
+    next();
   } catch (err) {
-    return next(err);
+    next(err);
   }
 };
 

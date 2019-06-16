@@ -10,13 +10,8 @@ const getTokenFromHeader = (req: Request) => {
   }
 };
 
-const secret = process.env.JWT_SECRET;
-if (!secret) {
-  if (!secret) throw new Error("There is no JWT secret set!");
-}
-
 export default jwt({
-  secret,
+  secret: process.env.JWT_SECRET || 'fake_secret',
   userProperty: "token", // this is where the next middleware can find the encoded data generated in services/auth:generateToken
   getToken: getTokenFromHeader
 });

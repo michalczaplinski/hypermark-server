@@ -10,13 +10,13 @@ export default class AuthService {
   public async login(email: string, password: string): Promise<any> {
     const user = await UserModel.findOne({ email });
     if (!user) {
-      throw new AppError(400, "User not found");
+      throw new AppError(400, "user_not_found");
     } else if (!user.password) {
-      throw new AppError(400, "The user does not have a password");
+      throw new AppError(400, "user_no_password");
     } else {
       const correctPassword = await argon2.verify(user.password, password);
       if (!correctPassword) {
-        throw new AppError(400, "Incorrect password");
+        throw new AppError(400, "incorrect_password");
       }
     }
 
@@ -55,7 +55,7 @@ export default class AuthService {
 
   private generateJWT(user: IUser) {
     const secret = process.env.JWT_SECRET;
-    if (!secret) throw new AppError(401, "There is no JWT secret set");
+    if (!secret) throw new AppError(401, "no_jwt_secret_set");
     return jwt.sign(
       {
         _id: user._id,

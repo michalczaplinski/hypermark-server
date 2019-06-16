@@ -32,7 +32,7 @@ export default async (
   }
 
   if (err.name === 'UnauthorizedError') {
-    return err;
+    return res.status(401).json({ error: 'UnauthorizedError', message: err.message });
   }
 
   if (err instanceof AppError) {
